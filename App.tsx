@@ -173,7 +173,13 @@ const App: React.FC = () => {
   
   const handleImageUpload = (file: File) => {
     setPaletteIndex(0);
-    setImageUrl(URL.createObjectURL(file));
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (reader.result && typeof reader.result === 'string') {
+        setImageUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
   
   const handleDownload = useCallback(async () => {
