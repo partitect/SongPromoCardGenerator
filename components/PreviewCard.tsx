@@ -38,15 +38,14 @@ const shadowStyles: Record<ImageShadow, React.CSSProperties> = {
 
 
 const ListenOnSection: React.FC<{ text: string, iconSizeClass: string }> = ({ text, iconSizeClass }) => (
-    <div className="mt-3 text-center">
-        <p className="text-xs opacity-70 mb-2">{text}</p>
-        <div className="flex items-center justify-center space-x-3">
-            <SpotifyIcon className={iconSizeClass} />
-            <AppleMusicIcon className={iconSizeClass} />
-            <YouTubeMusicIcon className={iconSizeClass} />
-            <AmazonMusicIcon className={iconSizeClass} />
-        </div>
+  <div className="mt-3 text-center">
+    <div className="flex items-center justify-center space-x-2">
+      <img src="/spotify.png" alt="Spotify" className={`${iconSizeClass} w-36 h-36 min-w-[112px] min-h-[112px] object-contain`} />
+      <img src="/apple.png" alt="Apple Music" className={`${iconSizeClass} w-36 h-36 min-w-[112px] min-h-[112px] object-contain`} />
+      <img src="/ytmusic.png" alt="YouTube Music" className={`${iconSizeClass} w-36 h-36 min-w-[112px] min-h-[112px] object-contain`} />
+      <img src="/amazon.png" alt="Amazon Music" className={`${iconSizeClass} w-36 h-36 min-w-[112px] min-h-[112px] object-contain`} />
     </div>
+  </div>
 );
 
 
