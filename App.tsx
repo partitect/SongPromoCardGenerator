@@ -7,9 +7,8 @@ import TextInput from './components/TextInput';
 import PreviewCard from './components/PreviewCard';
 
 // Type and Constant Imports
-import type { AspectRatio, Font, ImageShadow, Language } from './types';
+import type { AspectRatio, Font, ImageShadow } from './types';
 import { ASPECT_RATIOS, FONT_OPTIONS, IMAGE_SHADOW_OPTIONS } from './constants';
-import { translations } from './translations';
 
 // Hook and Utility Imports
 import { useDominantColor, hexToRgb, getLuminance, getContrastRatio } from './hooks/useDominantColor';
@@ -78,8 +77,7 @@ const SliderControl: React.FC<{
 type Tab = 'general' | 'color' | 'text' | 'effects';
 
 const App: React.FC = () => {
-  const [language, setLanguage] = useState<Language>('tr');
-  const t = translations[language];
+
 
   const [imageUrl, setImageUrl] = useState<string>(placeholderImage);
   const [songTitle, setSongTitle] = useState('Your Song Title');
@@ -211,10 +209,10 @@ const App: React.FC = () => {
   }, [palette, autoColor]);
 
   const TABS: { id: Tab; label: string }[] = [
-    { id: 'general', label: t.generalControls },
-    { id: 'color', label: t.colorControls },
-    { id: 'text', label: t.textControls },
-    { id: 'effects', label: t.effectsControls },
+    { id: 'general', label: 'General' },
+    { id: 'color', label: 'Colors' },
+    { id: 'text', label: 'Typography' },
+    { id: 'effects', label: 'Effects' },
   ];
 
   const selectedAspectRatio = ASPECT_RATIOS.find(ar => ar.ratio === aspectRatio) || ASPECT_RATIOS[0];
@@ -223,8 +221,8 @@ const App: React.FC = () => {
     <div className="bg-gray-900 text-white min-h-screen font-sans flex flex-col">
       <main className="container mx-auto p-4 lg:p-6 flex flex-col">
         <header className="text-center mb-6">
-          <h1 className="text-3xl lg:text-4xl font-bold">{t.title}</h1>
-          <p className="text-gray-400 mt-1 text-sm">{t.subtitle}</p>
+          <h1 className="text-3xl lg:text-4xl font-bold">AI Music Card Generator</h1>
+          <p className="text-gray-400 mt-1 text-sm">Create beautiful music promo cards in seconds.</p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -233,23 +231,23 @@ const App: React.FC = () => {
               <ImageUploader 
                 onImageUpload={handleImageUpload} 
                 currentImage={imageUrl}
-                label={t.albumArtLabel}
-                uploadPrompt={t.albumArtUploadPrompt}
-                fileTypes={t.albumArtFileTypes}
-                changeImagePrompt={t.albumArtChangeImage}
+                label={'Album Art'}
+                uploadPrompt={'Upload a file or drag & drop'}
+                fileTypes={'.jpg, .jpeg, .png, .webp'}
+                changeImagePrompt={'Change Image'}
               />
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <TextInput 
-                  label={t.songTitleLabel} 
+                  label={'Song Title'} 
                   value={songTitle} 
                   onChange={(e) => setSongTitle(e.target.value)}
-                  placeholder={t.songTitlePlaceholder}
+                  placeholder={'Enter song title...'}
                 />
                 <TextInput 
-                  label={t.artistNameLabel} 
+                  label={'Artist Name'} 
                   value={artistName} 
                   onChange={(e) => setArtistName(e.target.value)}
-                  placeholder={t.artistNamePlaceholder}
+                  placeholder={'Enter artist name...'}
                 />
               </div>
             </div>
@@ -275,8 +273,8 @@ const App: React.FC = () => {
               <div className="space-y-6 p-4 -mx-4">
                 {activeTab === 'general' && (
                   <div className="space-y-4">
-                     <h3 className="text-lg font-semibold">{t.layoutControls}</h3>
-                     <label className="block text-sm font-medium text-gray-300">{t.aspectRatio}</label>
+                     <h3 className="text-lg font-semibold">Layout</h3>
+                     <label className="block text-sm font-medium text-gray-300">Aspect Ratio</label>
                       <div className="flex space-x-2">
                         {ASPECT_RATIOS.map(({ name, ratio }) => (
                           <button 
@@ -288,27 +286,14 @@ const App: React.FC = () => {
                           </button>
                         ))}
                       </div>
-                      <div className="pt-2">
-                         <h3 className="text-lg font-semibold">{t.language}</h3>
-                         <div className="flex justify-start mt-2">
-                            {(Object.keys(translations) as Language[]).map(lang => (
-                                <button
-                                    key={lang}
-                                    onClick={() => setLanguage(lang)}
-                                    className={`px-3 py-1 text-sm rounded-md mr-2 transition ${language === lang ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}
-                                >
-                                    {lang.toUpperCase()}
-                                </button>
-                            ))}
-                        </div>
-                      </div>
+
                   </div>
                 )}
                 {activeTab === 'color' && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">{t.colorControls}</h3>
+                    <h3 className="text-lg font-semibold">Colors</h3>
                     <div className="flex items-center justify-between">
-                      <label className="text-sm font-medium text-gray-300">{t.autoColor}</label>
+                      <label className="text-sm font-medium text-gray-300">Auto Color</label>
                       <button onClick={handleAutoColorToggle} className={`px-3 py-1 text-sm rounded-md transition ${autoColor ? 'bg-green-600' : 'bg-gray-600'}`}>
                           {autoColor ? 'ON' : 'OFF'}
                       </button>
@@ -319,15 +304,15 @@ const App: React.FC = () => {
                       disabled={palette.length === 0}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7 1 1 0 015 8V5a1 1 0 011-1 1 1 0 100-2H5a1 1 0 01-1-1zm10.293 9.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414z" clipRule="evenodd" /><path fillRule="evenodd" d="M10 18a7.002 7.002 0 006.337-4.125 1 1 0 10-1.742-.944A5.002 5.002 0 0110 16a5 5 0 110-10 1 1 0 100-2 7 7 0 100 14z" clipRule="evenodd" /></svg>
-                      <span>{t.regenerateColors}</span>
+                      <span>Shuffle Palette</span>
                     </button>
                     <div className="flex items-center space-x-4 pt-1">
                       <div className="flex-1">
-                        <label htmlFor="backgroundColor" className="block text-sm font-medium text-gray-300 mb-1">{t.backgroundColor}</label>
+                        <label htmlFor="backgroundColor" className="block text-sm font-medium text-gray-300 mb-1">Background</label>
                         <input type="color" id="backgroundColor" value={backgroundColor} onChange={e => { setBackgroundColor(e.target.value); setAutoColor(false); }} className="w-full h-10 rounded-md border-gray-600 bg-gray-700" />
                       </div>
                       <div className="flex-1">
-                        <label htmlFor="textColor" className="block text-sm font-medium text-gray-300 mb-1">{t.textColor}</label>
+                        <label htmlFor="textColor" className="block text-sm font-medium text-gray-300 mb-1">Text</label>
                         <input type="color" id="textColor" value={textColor} onChange={e => { setTextColor(e.target.value); setAutoColor(false); }} className="w-full h-10 rounded-md border-gray-600 bg-gray-700" />
                       </div>
                     </div>
@@ -335,35 +320,35 @@ const App: React.FC = () => {
                 )}
                 {activeTab === 'text' && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">{t.textControls}</h3>
+                    <h3 className="text-lg font-semibold">Typography</h3>
                     <div>
-                      <label htmlFor="font" className="block text-sm font-medium text-gray-300 mb-2">{t.fontFamily}</label>
+                      <label htmlFor="font" className="block text-sm font-medium text-gray-300 mb-2">Font Family</label>
                       <select id="font" value={font} onChange={e => setFont(e.target.value as Font)} className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
                           {FONT_OPTIONS.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
                       </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-3 p-3 bg-gray-700/50 rounded-md">
-                            <h4 className="font-semibold text-center text-gray-300">{t.titleText}</h4>
-                            <SliderControl label={t.fontSize} value={titleFontSize} onChange={e => setTitleFontSize(Number(e.target.value))} min={16} max={128} step={1} />
-                            <SliderControl label={t.fontWeight} value={titleFontWeight} onChange={e => setTitleFontWeight(Number(e.target.value))} min={100} max={900} step={100} />
-                            <SliderControl label={t.letterSpacing} value={titleLetterSpacing} onChange={e => setTitleLetterSpacing(Number(e.target.value))} min={-5} max={20} step={0.1} />
+                            <h4 className="font-semibold text-center text-gray-300">Title</h4>
+                            <SliderControl label={'Font Size'} value={titleFontSize} onChange={e => setTitleFontSize(Number(e.target.value))} min={16} max={128} step={1} />
+                            <SliderControl label={'Font Weight'} value={titleFontWeight} onChange={e => setTitleFontWeight(Number(e.target.value))} min={100} max={900} step={100} />
+                            <SliderControl label={'Letter Spacing'} value={titleLetterSpacing} onChange={e => setTitleLetterSpacing(Number(e.target.value))} min={-5} max={20} step={0.1} />
                         </div>
                         <div className="space-y-3 p-3 bg-gray-700/50 rounded-md">
-                            <h4 className="font-semibold text-center text-gray-300">{t.artistText}</h4>
-                            <SliderControl label={t.fontSize} value={artistFontSize} onChange={e => setArtistFontSize(Number(e.target.value))} min={10} max={64} step={1} />
-                            <SliderControl label={t.fontWeight} value={artistFontWeight} onChange={e => setArtistFontWeight(Number(e.target.value))} min={100} max={900} step={100} />
-                            <SliderControl label={t.letterSpacing} value={artistLetterSpacing} onChange={e => setArtistLetterSpacing(Number(e.target.value))} min={-5} max={20} step={0.1} />
+                            <h4 className="font-semibold text-center text-gray-300">Artist</h4>
+                            <SliderControl label={'Font Size'} value={artistFontSize} onChange={e => setArtistFontSize(Number(e.target.value))} min={10} max={64} step={1} />
+                            <SliderControl label={'Font Weight'} value={artistFontWeight} onChange={e => setArtistFontWeight(Number(e.target.value))} min={100} max={900} step={100} />
+                            <SliderControl label={'Letter Spacing'} value={artistLetterSpacing} onChange={e => setArtistLetterSpacing(Number(e.target.value))} min={-5} max={20} step={0.1} />
                         </div>
                     </div>
                   </div>
                 )}
                 {activeTab === 'effects' && (
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold">{t.effectsControls}</h3>
-                    <label htmlFor="image-shadow" className="block text-sm font-medium text-gray-300 mb-2">{t.imageShadow}</label>
+                    <h3 className="text-lg font-semibold">Effects</h3>
+                    <label htmlFor="image-shadow" className="block text-sm font-medium text-gray-300 mb-2">Image Shadow</label>
                     <select id="image-shadow" value={imageShadow} onChange={e => setImageShadow(e.target.value as ImageShadow)} className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {IMAGE_SHADOW_OPTIONS.map(s => <option key={s.id} value={s.id}>{t[s.nameKey]}</option>)}
+                        {IMAGE_SHADOW_OPTIONS.map(s => <option key={s.id} value={s.id}>{s.nameKey.replace('shadow', 'Shadow').replace('None','None').replace('Sm','Small').replace('Md','Medium').replace('Lg','Large').replace('Xl','Extra Large')}</option>)}
                     </select>
                   </div>
                 )}
@@ -376,7 +361,7 @@ const App: React.FC = () => {
                   disabled={!fontsLoaded}
                   className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-wait text-white font-bold py-3 px-4 rounded-lg transition-colors"
               >
-                {fontsLoaded ? t.download : 'Loading Fonts...'}
+                {fontsLoaded ? 'Download' : 'Loading Fonts...'}
               </button>
             </div>
           </aside>
@@ -400,7 +385,7 @@ const App: React.FC = () => {
                     titleLetterSpacing={titleLetterSpacing}
                     artistLetterSpacing={artistLetterSpacing}
                     imageShadow={imageShadow}
-                    listenOn={t.listenOn}
+                    listenOn={'Listen On'}
                 />
             </div>
           </div>
