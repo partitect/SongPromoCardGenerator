@@ -1,6 +1,13 @@
 import React, { forwardRef } from 'react';
 import type { AspectRatio, Font, ImageShadow } from '../types';
 import { FONT_OPTIONS } from '../constants';
+import {
+  SpotifyIcon,
+  AppleMusicIcon,
+  YouTubeMusicIcon,
+  AmazonMusicIcon,
+} from './icons';
+
 
 interface PreviewCardProps {
   aspectRatio: AspectRatio;
@@ -18,6 +25,7 @@ interface PreviewCardProps {
   titleLetterSpacing: number;
   artistLetterSpacing: number;
   imageShadow: ImageShadow;
+  listenOn: string;
 }
 
 const shadowStyles: Record<ImageShadow, React.CSSProperties> = {
@@ -27,6 +35,19 @@ const shadowStyles: Record<ImageShadow, React.CSSProperties> = {
   lg: { filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.5))' },
   xl: { filter: 'drop-shadow(0 20px 25px rgba(0,0,0,0.6))' },
 };
+
+
+const ListenOnSection: React.FC<{ text: string, iconSizeClass: string }> = ({ text, iconSizeClass }) => (
+    <div className="mt-3 text-center">
+        <p className="text-xs opacity-70 mb-2">{text}</p>
+        <div className="flex items-center justify-center space-x-3">
+            <SpotifyIcon className={iconSizeClass} />
+            <AppleMusicIcon className={iconSizeClass} />
+            <YouTubeMusicIcon className={iconSizeClass} />
+            <AmazonMusicIcon className={iconSizeClass} />
+        </div>
+    </div>
+);
 
 
 const PreviewCard = forwardRef<HTMLDivElement, PreviewCardProps>(
@@ -45,25 +66,28 @@ const PreviewCard = forwardRef<HTMLDivElement, PreviewCardProps>(
     artistFontWeight, 
     titleLetterSpacing, 
     artistLetterSpacing,
-    imageShadow
+    imageShadow,
+    listenOn
   }, ref) => {
     
     const selectedFont = FONT_OPTIONS.find(f => f.id === font) || FONT_OPTIONS[0];
     const fontFamily = selectedFont.family;
 
-    // 16:9 aspect ratio - horizontal layout
     if (aspectRatio === '16:9') {
       return (
         <div ref={ref} className={`w-full overflow-hidden rounded-lg ${aspectRatioClass}`} style={{ backgroundColor }}>
-          <div className="relative flex flex-row items-center h-full p-6 text-left" style={{ color: textColor }}>
+          <div className="relative flex flex-row items-center h-full p-8 text-left" style={{ color: textColor }}>
             
             <div className="w-2/5 aspect-square flex-shrink-0">
                <img src={imageUrl} alt="Album Art" className="w-full h-full object-cover rounded-xl" style={shadowStyles[imageShadow]} />
             </div>
 
-            <div className="flex-grow flex flex-col justify-center pl-6">
+            <div className="flex-grow flex flex-col justify-center pl-8">
                 <h2 style={{ fontFamily, fontSize: `${titleFontSize}px`, fontWeight: titleFontWeight, lineHeight: 1.2, textAlign: 'center', letterSpacing: `${titleLetterSpacing}px`, overflowWrap: 'break-word' }}>{songTitle}</h2>
                 <h3 className={`mt-3 opacity-90`} style={{ fontFamily, fontSize: `${artistFontSize}px`, fontWeight: artistFontWeight, textAlign: 'center', letterSpacing: `${artistLetterSpacing}px` }}>{artistName}</h3>
+                <div className="w-full flex justify-center">
+                    <ListenOnSection text={listenOn} iconSizeClass="h-6 w-6" />
+                </div>
             </div>
             
           </div>
@@ -71,17 +95,18 @@ const PreviewCard = forwardRef<HTMLDivElement, PreviewCardProps>(
       );
     }
 
-    // 1:1 and 9:16 aspect ratios - vertical layouts
     const layoutConfig = {
       '1:1': {
-        padding: 'p-[10%]',
+        padding: 'p-[8%]',
         imageWidth: 'w-[60%]',
         titleSizeMultiplier: 1,
+        iconSizeClass: 'h-6 w-6'
       },
       '9:16': {
-        padding: 'p-[12%]',
-        imageWidth: 'w-[85%]',
+        padding: 'p-[10%]',
+        imageWidth: 'w-[80%]',
         titleSizeMultiplier: 1.2,
+        iconSizeClass: 'h-7 w-7'
       },
     };
     
@@ -90,13 +115,13 @@ const PreviewCard = forwardRef<HTMLDivElement, PreviewCardProps>(
 
     return (
       <div ref={ref} className={`w-full overflow-hidden rounded-lg ${aspectRatioClass}`} style={{ backgroundColor }}>
-        <div className={`relative flex flex-col items-center justify-between h-full ${currentConfig.padding} text-center`} style={{ color: textColor }}>
+        <div className={`relative flex flex-col items-center justify-around h-full ${currentConfig.padding} text-center`} style={{ color: textColor }}>
           
           <div className="w-full">
             <h2 style={{ fontFamily, fontSize: `${titleSize}px`, fontWeight: titleFontWeight, lineHeight: 1.2, letterSpacing: `${titleLetterSpacing}px`, overflowWrap: 'break-word' }}>{songTitle}</h2>
           </div>
 
-          <div className={`w-full flex-grow flex items-center justify-center min-h-0 my-4`}>
+          <div className={`w-full flex items-center justify-center min-h-0 my-4`}>
             <div className={`${currentConfig.imageWidth} aspect-square`}>
                 <img 
                 src={imageUrl} 
@@ -109,6 +134,7 @@ const PreviewCard = forwardRef<HTMLDivElement, PreviewCardProps>(
 
           <div className="w-full">
              <h3 className={`opacity-80`} style={{ fontFamily, fontSize: `${artistFontSize}px`, fontWeight: artistFontWeight, letterSpacing: `${artistLetterSpacing}px` }}>{artistName}</h3>
+             <ListenOnSection text={listenOn} iconSizeClass={currentConfig.iconSizeClass}/>
           </div>
 
         </div>

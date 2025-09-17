@@ -17,12 +17,15 @@ export const translations: Record<Language, { [key: string]: string }> = {
     songTitlePlaceholder: 'Enter song title...',
     artistNameLabel: 'Artist Name',
     artistNamePlaceholder: 'Enter artist name...',
+    listenOn: 'Listen On',
 
     // Controls Section Headers
+    generalControls: 'General',
     layoutControls: 'Layout',
     colorControls: 'Colors',
     textControls: 'Typography',
     effectsControls: 'Effects',
+    language: 'Language',
 
     // Layout Controls
     aspectRatio: 'Aspect Ratio',
@@ -52,9 +55,6 @@ export const translations: Record<Language, { [key: string]: string }> = {
 
     // Actions
     download: 'Download Card',
-
-    // Footer
-    findUsOn: 'Find us on',
   },
   es: {
     title: 'Generador de Tarjetas de Música AI',
@@ -67,10 +67,13 @@ export const translations: Record<Language, { [key: string]: string }> = {
     songTitlePlaceholder: 'Introduce el título...',
     artistNameLabel: 'Nombre del Artista',
     artistNamePlaceholder: 'Introduce el nombre del artista...',
+    listenOn: 'Escuchar en',
+    generalControls: 'General',
     layoutControls: 'Diseño',
     colorControls: 'Colores',
     textControls: 'Tipografía',
     effectsControls: 'Efectos',
+    language: 'Idioma',
     aspectRatio: 'Relación de Aspecto',
     backgroundColor: 'Color de Fondo',
     textColor: 'Color de Texto',
@@ -90,7 +93,6 @@ export const translations: Record<Language, { [key: string]: string }> = {
     shadowLg: 'Grande',
     shadowXl: 'Extra Grande',
     download: 'Descargar Tarjeta',
-    findUsOn: 'Encuéntranos en',
   },
   de: {
     title: 'KI-Musik-Karten-Generator',
@@ -103,10 +105,13 @@ export const translations: Record<Language, { [key: string]: string }> = {
     songTitlePlaceholder: 'Songtitel eingeben...',
     artistNameLabel: 'Künstlername',
     artistNamePlaceholder: 'Künstlernamen eingeben...',
+    listenOn: 'Hören auf',
+    generalControls: 'Allgemein',
     layoutControls: 'Layout',
     colorControls: 'Farben',
     textControls: 'Typografie',
     effectsControls: 'Effekte',
+    language: 'Sprache',
     aspectRatio: 'Seitenverhältnis',
     backgroundColor: 'Hintergrundfarbe',
     textColor: 'Textfarbe',
@@ -126,7 +131,6 @@ export const translations: Record<Language, { [key: string]: string }> = {
     shadowLg: 'Groß',
     shadowXl: 'Extra groß',
     download: 'Karte herunterladen',
-    findUsOn: 'Finden Sie uns auf',
   },
   tr: {
     title: 'Yapay Zeka Müzik Kartı Oluşturucu',
@@ -139,10 +143,13 @@ export const translations: Record<Language, { [key: string]: string }> = {
     songTitlePlaceholder: 'Şarkı adını girin...',
     artistNameLabel: 'Sanatçı Adı',
     artistNamePlaceholder: 'Sanatçı adını girin...',
+    listenOn: 'Şurada Dinle',
+    generalControls: 'Genel',
     layoutControls: 'Düzen',
     colorControls: 'Renkler',
     textControls: 'Tipografi',
     effectsControls: 'Efektler',
+    language: 'Dil',
     aspectRatio: 'En Boy Oranı',
     backgroundColor: 'Arka Plan Rengi',
     textColor: 'Metin Rengi',
@@ -162,6 +169,5 @@ export const translations: Record<Language, { [key: string]: string }> = {
     shadowLg: 'Büyük',
     shadowXl: 'Ekstra Büyük',
     download: 'Kartı İndir',
-    findUsOn: 'Bizi bulun',
   },
 };
