@@ -19,6 +19,56 @@ import { useDominantColor, hexToRgb, getLuminance, getContrastRatio } from './ho
 const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%232d3748'/%3E%3Cpath d='M256 128a64 64 0 100 128 64 64 0 000-128zm0 160c-88.36 0-160 53.33-160 119.2V448h320v-40.8c0-65.87-71.64-119.2-160-119.2z' fill='%234a5568'/%3E%3C/svg%3E";
 
 
+// Helper function to find all font URLs in a CSS text, fetch them,
+// and replace the URLs with base64-encoded data URLs.
+// This is necessary because html-to-image's internal fetch can fail
+// in certain environments due to CORS or other network policies.
+const embedFontResources = async (cssText: string): Promise<string> => {
+  const fontUrlRegex = /url\((['"]?)(.*?)\1\)/g;
+
+  // Use a Set to fetch each unique URL only once.
+  const fontUrls = new Set(
+    Array.from(cssText.matchAll(fontUrlRegex), (match) => match[2])
+  );
+
+  const urlToDataUrlMap = new Map<string, string>();
+
+  await Promise.all(
+    Array.from(fontUrls).map(async (url) => {
+      try {
+        // Fetch the font file as a blob. A standard fetch is more reliable.
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch font: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+
+        // Convert the blob to a base64 data URL.
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+
+        // Store the mapping from the original URL to the new data URL.
+        urlToDataUrlMap.set(url, dataUrl);
+      } catch (e) {
+        console.error(`Failed to fetch and embed font ${url}:`, e);
+        // If fetching fails, the URL won't be in the map, and the original will be used.
+      }
+    })
+  );
+
+  // Replace all occurrences of the original URLs with their data URL counterparts.
+  return cssText.replace(fontUrlRegex, (match, quote, url) => {
+    const dataUrl = urlToDataUrlMap.get(url);
+    // If we have a data URL, use it. Otherwise, return the original `url(...)` string.
+    return dataUrl ? `url(${quote}${dataUrl}${quote})` : match;
+  });
+};
+
+
 // Helper component for sliders
 const SliderControl: React.FC<{
   label: string;
@@ -67,8 +117,52 @@ const App: React.FC = () => {
   const [artistLetterSpacing, setArtistLetterSpacing] = useState(0);
   
   const [imageShadow, setImageShadow] = useState<ImageShadow>('md');
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
   const previewCardRef = useRef<HTMLDivElement>(null);
+
+  // Effect to pre-load, embed, and clean up fonts on initial app load.
+  useEffect(() => {
+    const preloadFonts = async () => {
+      const fontLink = document.getElementById('google-fonts') as HTMLLinkElement;
+      try {
+        if (!fontLink?.href) {
+          console.error("Could not find Google Fonts stylesheet link.");
+          setFontsLoaded(true);
+          return;
+        }
+
+        const fontCssResponse = await fetch(fontLink.href);
+        if (!fontCssResponse.ok) {
+          throw new Error(`Failed to fetch font CSS: ${fontCssResponse.statusText}`);
+        }
+        const fontCssText = await fontCssResponse.text();
+        
+        const embeddedFontCss = await embedFontResources(fontCssText);
+
+        const style = document.createElement('style');
+        style.textContent = embeddedFontCss;
+        document.head.appendChild(style);
+
+        // CRITICAL STEP: Remove the original link tag to prevent html-to-image
+        // from trying to access a cross-origin stylesheet.
+        fontLink.remove();
+
+        setFontsLoaded(true);
+      } catch (error) {
+        console.error("Failed to pre-load and embed fonts:", error);
+        // If embedding fails, still remove the problematic link to prevent
+        // a CORS error during download. The image will use fallback fonts.
+        if (fontLink) {
+          fontLink.remove();
+        }
+        setFontsLoaded(true);
+      }
+    };
+
+    preloadFonts();
+  }, []); // Empty dependency array ensures this runs only once on mount.
+
 
   // Auto-update colors when image changes or palette is shuffled
   useEffect(() => {
@@ -115,22 +209,33 @@ const App: React.FC = () => {
     setImageUrl(URL.createObjectURL(file));
   };
   
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
     if (previewCardRef.current === null) {
       return;
     }
-    toPng(previewCardRef.current, { cacheBust: true, pixelRatio: 2 })
-      .then((dataUrl) => {
-        const link = document.createElement('a');
-        link.download = `${artistName.toLowerCase().replace(/\s+/g,'-')}-${songTitle.toLowerCase().replace(/\s+/g,'-')}.png`;
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch((err) => {
-        console.error('oops, something went wrong!', err);
-        alert("Could not download image. See console for details.")
+
+    try {
+      // By removing the original <link>, we prevent CORS errors.
+      const dataUrl = await toPng(previewCardRef.current, { 
+        cacheBust: true, 
+        pixelRatio: 2,
       });
+
+      const link = document.createElement('a');
+      link.download = `${artistName.toLowerCase().replace(/\s+/g, '-')}-${songTitle.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('oops, something went wrong!', err);
+      let message = "Could not download image. A network issue or browser extension might be interfering.";
+       if (err instanceof Error) {
+            message += `\n\nError: ${err.message}`;
+       }
+      message += "\n\nPlease check your browser's console for more details.";
+      alert(message);
+    }
   }, [previewCardRef, songTitle, artistName]);
+
 
   const handleAutoColorToggle = () => {
     const newAutoColor = !autoColor;
@@ -283,8 +388,12 @@ const App: React.FC = () => {
                </select>
             </div>
 
-            <button onClick={handleDownload} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
-              {t.download}
+            <button 
+                onClick={handleDownload} 
+                disabled={!fontsLoaded}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-wait text-white font-bold py-3 px-4 rounded-lg transition-colors"
+            >
+              {fontsLoaded ? t.download : 'Loading Fonts...'}
             </button>
 
           </aside>
