@@ -84,7 +84,7 @@ const App: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>(placeholderImage);
   const [songTitle, setSongTitle] = useState('Your Song Title');
   const [artistName, setArtistName] = useState('Artist Name');
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('9:16');
   const [activeTab, setActiveTab] = useState<Tab>('general');
 
   const { palette } = useDominantColor(imageUrl);

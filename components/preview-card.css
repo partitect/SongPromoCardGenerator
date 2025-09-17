@@ -1,0 +1,14 @@
+.preview-title{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  /* Standard property for broader compatibility */
+  line-clamp: 2;
+  /* Ensure consistent line-height and cap the height to 2 lines (uses element's font-size via em)
+     so very large inline font-sizes still won't push content out of the card. */
+  line-height: 1.2;
+  max-height: calc(1.2em * 2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}

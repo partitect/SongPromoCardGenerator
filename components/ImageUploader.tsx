@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 interface ImageUploaderProps {
   onImageUpload: (file: File) => void;
@@ -17,7 +17,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   fileTypes,
   changeImagePrompt 
 }) => {
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -30,24 +32,56 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      onImageUpload(e.dataTransfer.files[0]);
+    }
+  };
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-300 mb-2">{label}</label>
       <div
-        className="mt-1 flex justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md cursor-pointer hover:border-gray-500 transition-colors"
+        className={`relative mt-1 flex flex-col justify-center items-center border-2 border-dashed rounded-xl cursor-pointer transition-colors duration-200 bg-gradient-to-br from-gray-800 to-gray-700 shadow-lg ${dragActive ? 'border-indigo-400 bg-indigo-950/30' : 'border-gray-600 hover:border-indigo-400'}`}
+        style={{ minHeight: 200 }}
         onClick={handleClick}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        tabIndex={0}
       >
         {currentImage ? (
-          <div className="relative group">
-            <img src={currentImage} alt="Preview" className="max-h-48 rounded-md" />
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-white text-sm font-semibold">{changeImagePrompt}</span>
-            </div>
+          <div className="relative group w-full flex flex-col items-center justify-center">
+            <img src={currentImage} alt="Preview" className="max-h-56 max-w-xs rounded-lg shadow-md object-cover transition-transform duration-200 group-hover:scale-105" />
+            <button
+              type="button"
+              className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-indigo-600 text-white font-semibold text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-indigo-700 focus:outline-none"
+              onClick={handleClick}
+              tabIndex={-1}
+            >
+              {changeImagePrompt}
+            </button>
+            <div className="absolute inset-0 rounded-lg bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
           </div>
         ) : (
-          <div className="space-y-1 text-center">
+          <div className="flex flex-col items-center justify-center py-8 w-full">
             <svg
-              className="mx-auto h-12 w-12 text-gray-500"
+              className="mx-auto h-16 w-16 text-indigo-400 mb-3 drop-shadow-lg"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -60,11 +94,13 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-            <div className="flex text-sm text-gray-400">
-              <p className="pl-1">{uploadPrompt}</p>
-            </div>
-            <p className="text-xs text-gray-500">{fileTypes}</p>
+            <span className="text-base font-medium text-gray-200 mb-1">{uploadPrompt}</span>
+            <span className="text-xs text-gray-400 mb-2">{fileTypes}</span>
+            <span className="text-xs text-gray-500">Sürükleyip bırak veya tıkla</span>
           </div>
+        )}
+        {dragActive && (
+          <div className="absolute inset-0 z-10 rounded-xl border-4 border-indigo-400 bg-indigo-900/20 pointer-events-none animate-pulse" />
         )}
       </div>
       <input
