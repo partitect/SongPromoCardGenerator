@@ -323,8 +323,22 @@ const App: React.FC = () => {
                     <h3 className="text-lg font-semibold">Typography</h3>
                     <div>
                       <label htmlFor="font" className="block text-sm font-medium text-gray-300 mb-2">Font Family</label>
-                      <select id="font" value={font} onChange={e => setFont(e.target.value as Font)} className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                          {FONT_OPTIONS.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                      <select
+                        id="font"
+                        value={font}
+                        onChange={e => setFont(e.target.value as Font)}
+                        className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        style={{ fontFamily: FONT_OPTIONS.find(f => f.id === font)?.family || 'inherit' }}
+                      >
+                        {FONT_OPTIONS.map(f => (
+                          <option
+                            key={f.id}
+                            value={f.id}
+                            style={{ fontFamily: f.family }}
+                          >
+                            {f.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
